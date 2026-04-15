@@ -50,7 +50,7 @@ router.delete(
   CourseController.deleteCourse
 );
 
-// POST /api/courses/:id/enroll  — student enrolment
+// POST /api/courses/:id/enroll  — student enrollment
 router.post('/:id/enroll', authenticate, CourseController.enrollInCourse);
 
 module.exports = router;

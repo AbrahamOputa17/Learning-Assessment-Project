@@ -27,7 +27,7 @@ const QuizService = {
     const course = await CourseModel.findById(courseId);
     if (!course) throw new AppError('Course not found', 404);
     if (course.instructor_id !== instructorId) {
-      throw new AppError('Not authorised to create quizzes for this course', 403);
+      throw new AppError('Not authorized to create quizzes for this course', 403);
     }
     return QuizModel.create({ courseId, ...data });
   },
@@ -38,7 +38,7 @@ const QuizService = {
 
     const course = await CourseModel.findById(quiz.course_id);
     if (course.instructor_id !== instructorId) {
-      throw new AppError('Not authorised to update this quiz', 403);
+      throw new AppError('Not authorized to update this quiz', 403);
     }
     return QuizModel.update(quizId, data);
   },
@@ -49,7 +49,7 @@ const QuizService = {
 
     const course = await CourseModel.findById(quiz.course_id);
     if (course.instructor_id !== instructorId) {
-      throw new AppError('Not authorised to delete this quiz', 403);
+      throw new AppError('Not authorized to delete this quiz', 403);
     }
     await QuizModel.delete(quizId);
   },
@@ -60,7 +60,7 @@ const QuizService = {
 
     const course = await CourseModel.findById(quiz.course_id);
     if (course.instructor_id !== instructorId) {
-      throw new AppError('Not authorised', 403);
+      throw new AppError('Not authorized', 403);
     }
 
     const question = await QuizModel.createQuestion({
@@ -104,7 +104,7 @@ const QuizService = {
   async submitAttempt(attemptId, userId, submittedAnswers) {
     const attempt = await QuizModel.findAttempt(attemptId);
     if (!attempt) throw new AppError('Attempt not found', 404);
-    if (attempt.user_id !== userId) throw new AppError('Not authorised', 403);
+    if (attempt.user_id !== userId) throw new AppError('Not authorized', 403);
     if (attempt.submitted_at) throw new AppError('Attempt already submitted', 400);
 
     const quiz = await QuizModel.findByIdWithQuestions(attempt.quiz_id);

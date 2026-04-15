@@ -89,7 +89,7 @@ const CodingService = {
     const course = await CourseModel.findById(courseId);
     if (!course) throw new AppError('Course not found', 404);
     if (course.instructor_id !== instructorId) {
-      throw new AppError('Not authorised to create quizzes for this course', 403);
+      throw new AppError('Not authorized to create quizzes for this course', 403);
     }
     return CodingModel.createQuiz({ courseId, ...data });
   },
@@ -100,7 +100,7 @@ const CodingService = {
 
     const course = await CourseModel.findById(quiz.course_id);
     if (course.instructor_id !== instructorId) {
-      throw new AppError('Not authorised to update this quiz', 403);
+      throw new AppError('Not authorized to update this quiz', 403);
     }
     return CodingModel.updateQuiz(quizId, data);
   },
@@ -111,7 +111,7 @@ const CodingService = {
 
     const course = await CourseModel.findById(quiz.course_id);
     if (course.instructor_id !== instructorId) {
-      throw new AppError('Not authorised to delete this quiz', 403);
+      throw new AppError('Not authorized to delete this quiz', 403);
     }
     await CodingModel.deleteQuiz(quizId);
   },
@@ -122,7 +122,7 @@ const CodingService = {
 
     const course = await CourseModel.findById(quiz.course_id);
     if (course.instructor_id !== instructorId) {
-      throw new AppError('Not authorised', 403);
+      throw new AppError('Not authorized', 403);
     }
 
     const question = await CodingModel.createQuestion({
@@ -225,7 +225,7 @@ const CodingService = {
   async getSubmissionResults(submissionId, userId) {
     const submission = await CodingModel.findSubmissionById(submissionId);
     if (!submission) throw new AppError('Submission not found', 404);
-    if (submission.user_id !== userId) throw new AppError('Not authorised', 403);
+    if (submission.user_id !== userId) throw new AppError('Not authorized', 403);
     return submission;
   },
 

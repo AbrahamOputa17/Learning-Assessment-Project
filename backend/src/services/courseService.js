@@ -24,7 +24,7 @@ const CourseService = {
     const course = await CourseModel.findById(id);
     if (!course) throw new AppError('Course not found', 404);
     if (course.instructor_id !== instructorId) {
-      throw new AppError('Not authorised to update this course', 403);
+      throw new AppError('Not authorized to update this course', 403);
     }
     return CourseModel.update(id, data);
   },
@@ -33,7 +33,7 @@ const CourseService = {
     const course = await CourseModel.findById(id);
     if (!course) throw new AppError('Course not found', 404);
     if (course.instructor_id !== instructorId) {
-      throw new AppError('Not authorised to delete this course', 403);
+      throw new AppError('Not authorized to delete this course', 403);
     }
     await CourseModel.delete(id);
   },
@@ -41,7 +41,7 @@ const CourseService = {
   async enrollStudent(userId, courseId) {
     const course = await CourseModel.findById(courseId);
     if (!course) throw new AppError('Course not found', 404);
-    if (!course.is_published) throw new AppError('Course is not available for enrolment', 400);
+    if (!course.is_published) throw new AppError('Course is not available for enrollment', 400);
 
     const result = await CourseModel.enroll(userId, courseId);
     return result || { message: 'Already enrolled' };
