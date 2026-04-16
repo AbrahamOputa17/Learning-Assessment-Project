@@ -20,19 +20,19 @@ const CourseService = {
     return CourseModel.create({ ...data, instructorId });
   },
 
-  async updateCourse(id, instructorId, data) {
+  async updateCourse(id, user, data) {
     const course = await CourseModel.findById(id);
     if (!course) throw new AppError('Course not found', 404);
-    if (course.instructor_id !== instructorId) {
+    if (course.instructor_id !== user.id && user.role !== 'admin') {
       throw new AppError('Not authorized to update this course', 403);
     }
     return CourseModel.update(id, data);
   },
 
-  async deleteCourse(id, instructorId) {
+  async deleteCourse(id, user) {
     const course = await CourseModel.findById(id);
     if (!course) throw new AppError('Course not found', 404);
-    if (course.instructor_id !== instructorId) {
+    if (course.instructor_id !== user.id && user.role !== 'admin') {
       throw new AppError('Not authorized to delete this course', 403);
     }
     await CourseModel.delete(id);

@@ -13,6 +13,7 @@ import DashboardPage from './pages/DashboardPage';
 import CoursesPage from './pages/courses/CoursesPage';
 import CourseDetailPage from './pages/courses/CourseDetailPage';
 import CreateCoursePage from './pages/courses/CreateCoursePage';
+import EditCoursePage from './pages/courses/EditCoursePage';
 
 // Quizzes
 import TakeQuizPage from './pages/quizzes/TakeQuizPage';
@@ -58,6 +59,14 @@ export default function App() {
             element={
               <ProtectedRoute roles={['instructor', 'admin']}>
                 <CreateCoursePage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/courses/:id/edit"
+            element={
+              <ProtectedRoute roles={['instructor', 'admin']}>
+                <EditCoursePage />
               </ProtectedRoute>
             }
           />

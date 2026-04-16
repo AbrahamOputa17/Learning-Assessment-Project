@@ -18,6 +18,7 @@ export default function CourseDetailPage() {
   const [codingQuizzes, setCodingQuizzes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [enrolling, setEnrolling] = useState(false);
+  const [publishing, setPublishing] = useState(false);
   const [message, setMessage] = useState({ type: '', text: '' });
 
   useEffect(() => {
@@ -49,6 +50,22 @@ export default function CourseDetailPage() {
       setMessage({ type: 'error', text: err.response?.data?.message || 'Enrollment failed' });
     } finally {
       setEnrolling(false);
+    }
+  };
+
+  const handlePublishToggle = async () => {
+    setPublishing(true);
+    try {
+      const res = await coursesApi.update(id, { is_published: !course.is_published });
+      setCourse(res.data.data.course);
+      setMessage({
+        type: 'success',
+        text: res.data.data.course.is_published ? 'Course published!' : 'Course unpublished.',
+      });
+    } catch {
+      setMessage({ type: 'error', text: 'Failed to update publish status' });
+    } finally {
+      setPublishing(false);
     }
   };
 
@@ -103,6 +120,13 @@ export default function CourseDetailPage() {
                     <Link to={`/courses/${id}/edit`}>
                       <Button variant="secondary">Edit Course</Button>
                     </Link>
+                    <Button
+                      variant="secondary"
+                      onClick={handlePublishToggle}
+                      loading={publishing}
+                    >
+                      {course.is_published ? 'Unpublish' : 'Publish'}
+                    </Button>
                     <Button variant="danger" onClick={handleDelete}>Delete</Button>
                   </>
                 ) : (
