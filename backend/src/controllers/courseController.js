@@ -3,10 +3,10 @@ const CourseService = require('../services/courseService');
 const CourseController = {
   async getAllCourses(req, res, next) {
     try {
-      const { category, difficulty, limit, offset } = req.query;
+      const { category, level, limit, offset } = req.query;
       const courses = await CourseService.getAllCourses({
         category,
-        difficulty,
+        level,
         limit: limit ? parseInt(limit, 10) : 20,
         offset: offset ? parseInt(offset, 10) : 0,
       });

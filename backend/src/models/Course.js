@@ -4,7 +4,7 @@ const CourseModel = {
   /**
    * Get all published courses with instructor info.
    */
-  async findAll({ limit = 20, offset = 0, category, difficulty } = {}) {
+  async findAll({ limit = 20, offset = 0, category, level } = {}) {
     const conditions = ['c.is_published = TRUE'];
     const values = [];
     let idx = 1;
@@ -13,9 +13,9 @@ const CourseModel = {
       conditions.push(`c.category = $${idx++}`);
       values.push(category);
     }
-    if (difficulty) {
-      conditions.push(`c.difficulty = $${idx++}`);
-      values.push(difficulty);
+    if (level) {
+      conditions.push(`c.level = $${idx++}`);
+      values.push(level);
     }
 
     values.push(limit, offset);
@@ -64,12 +64,12 @@ const CourseModel = {
   /**
    * Create a new course.
    */
-  async create({ title, description, instructorId, category, difficulty }) {
+  async create({ title, description, instructorId, category, level }) {
     const result = await query(
-      `INSERT INTO courses (title, description, instructor_id, category, difficulty)
+      `INSERT INTO courses (title, description, instructor_id, category, level)
        VALUES ($1, $2, $3, $4, $5)
        RETURNING *`,
-      [title, description, instructorId, category, difficulty]
+      [title, description, instructorId, category, level]
     );
     return result.rows[0];
   },
@@ -78,7 +78,7 @@ const CourseModel = {
    * Update a course.
    */
   async update(id, fields) {
-    const allowed = ['title', 'description', 'category', 'difficulty', 'is_published'];
+    const allowed = ['title', 'description', 'category', 'level', 'is_published'];
     const updates = [];
     const values = [];
     let idx = 1;

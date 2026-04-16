@@ -13,7 +13,7 @@ export default function CreateCoursePage() {
     title: '',
     description: '',
     category: '',
-    difficulty: '100',
+    level: '100',
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -70,10 +70,10 @@ export default function CreateCoursePage() {
                 placeholder="e.g. Programming, Mathematics"
               />
               <Select
-                id="difficulty"
-                label="Difficulty"
-                name="difficulty"
-                value={form.difficulty}
+                id="level"
+                label="Level"
+                name="level"
+                value={form.level}
                 onChange={handleChange}
               >
                 <option value="100">100 Level</option>

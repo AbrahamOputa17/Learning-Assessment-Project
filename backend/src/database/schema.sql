@@ -30,7 +30,7 @@ CREATE TABLE IF NOT EXISTS courses (
   description   TEXT,
   instructor_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   category      VARCHAR(100),
-  difficulty    VARCHAR(20) DEFAULT '100' CHECK (difficulty IN ('100', '200', '300', '400')),
+  level         VARCHAR(20) DEFAULT '100' CHECK (level IN ('100', '200', '300', '400')),
   is_published  BOOLEAN NOT NULL DEFAULT FALSE,
   created_at    TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at    TIMESTAMPTZ NOT NULL DEFAULT NOW()

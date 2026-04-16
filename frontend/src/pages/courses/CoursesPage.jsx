@@ -13,14 +13,14 @@ export default function CoursesPage() {
   const { user } = useAuth();
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [filters, setFilters] = useState({ category: '', difficulty: '' });
+  const [filters, setFilters] = useState({ category: '', level: '' });
 
   const load = async () => {
     setLoading(true);
     try {
       const params = {};
       if (filters.category) params.category = filters.category;
-      if (filters.difficulty) params.difficulty = filters.difficulty;
+      if (filters.level) params.level = filters.level;
       const res = await coursesApi.getAll(params);
       setCourses(res.data.data.courses);
     } catch {
@@ -60,8 +60,8 @@ export default function CoursesPage() {
             className="w-44"
           />
           <Select
-            value={filters.difficulty}
-            onChange={(e) => setFilters((f) => ({ ...f, difficulty: e.target.value }))}
+            value={filters.level}
+            onChange={(e) => setFilters((f) => ({ ...f, level: e.target.value }))}
             className="w-44"
           >
             <option value="">All levels</option>
@@ -103,9 +103,9 @@ function CourseCard({ course }) {
         <CardBody className="flex flex-col gap-3 flex-1">
           <div className="flex items-start justify-between gap-2">
             <h3 className="font-semibold text-gray-900 line-clamp-2 flex-1">{course.title}</h3>
-            {course.difficulty && (
-              <Badge color={diffColor[course.difficulty] || 'gray'}>
-                {capitalize(course.difficulty)}
+            {course.level && (
+              <Badge color={diffColor[course.level] || 'gray'}>
+                {capitalize(course.level)}
               </Badge>
             )}
           </div>

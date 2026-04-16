@@ -132,9 +132,9 @@ function CourseCard({ course }) {
         <CardBody className="space-y-3">
           <div className="flex items-start justify-between gap-2">
             <h3 className="font-semibold text-gray-900 line-clamp-2">{course.title}</h3>
-            {course.difficulty && (
-              <Badge color={diffColor[course.difficulty] || 'gray'}>
-                {capitalize(course.difficulty)}
+            {course.level && (
+              <Badge color={diffColor[course.level] || 'gray'}>
+                {capitalize(course.level)}
               </Badge>
             )}
           </div>
