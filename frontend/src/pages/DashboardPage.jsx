@@ -121,9 +121,10 @@ function StatCard({ label, value, icon, color }) {
 
 function CourseCard({ course }) {
   const diffColor = {
-    beginner: 'green',
-    intermediate: 'yellow',
-    advanced: 'red',
+    '100': 'green',
+    '200': 'blue',
+    '300': 'yellow',
+    '400': 'red',
   };
   return (
     <Link to={`/courses/${course.id}`}>

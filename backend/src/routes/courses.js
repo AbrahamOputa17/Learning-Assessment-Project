@@ -27,7 +27,7 @@ router.post(
     body('title').trim().notEmpty().withMessage('Title is required'),
     body('difficulty')
       .optional()
-      .isIn(['beginner', 'intermediate', 'advanced'])
+      .isIn(['100', '200', '300', '400'])
       .withMessage('Invalid difficulty'),
   ],
   validate,

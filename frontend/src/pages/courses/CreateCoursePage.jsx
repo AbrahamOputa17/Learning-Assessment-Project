@@ -13,7 +13,7 @@ export default function CreateCoursePage() {
     title: '',
     description: '',
     category: '',
-    difficulty: 'beginner',
+    difficulty: '100',
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -76,9 +76,10 @@ export default function CreateCoursePage() {
                 value={form.difficulty}
                 onChange={handleChange}
               >
-                <option value="beginner">Beginner</option>
-                <option value="intermediate">Intermediate</option>
-                <option value="advanced">Advanced</option>
+                <option value="100">100 Level</option>
+                <option value="200">200 Level</option>
+                <option value="300">300 Level</option>
+                <option value="400">400 Level</option>
               </Select>
               <div className="flex gap-3 pt-2">
                 <Button type="submit" loading={loading}>Create Course</Button>

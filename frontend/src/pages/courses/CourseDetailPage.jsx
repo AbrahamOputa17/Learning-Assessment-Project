@@ -68,7 +68,7 @@ export default function CourseDetailPage() {
     user?.id === course?.instructor_id ||
     user?.role === 'admin';
 
-  const diffColor = { beginner: 'green', intermediate: 'yellow', advanced: 'red' };
+  const diffColor = { '100': 'green', '200': 'blue', '300': 'yellow', '400': 'red' };
 
   return (
     <Layout>

@@ -65,9 +65,10 @@ export default function CoursesPage() {
             className="w-44"
           >
             <option value="">All levels</option>
-            <option value="beginner">Beginner</option>
-            <option value="intermediate">Intermediate</option>
-            <option value="advanced">Advanced</option>
+            <option value="100">100 Level</option>
+            <option value="200">200 Level</option>
+            <option value="300">300 Level</option>
+            <option value="400">400 Level</option>
           </Select>
           <Button type="submit" variant="secondary">Filter</Button>
         </form>
@@ -93,7 +94,7 @@ export default function CoursesPage() {
   );
 }
 
-const diffColor = { beginner: 'green', intermediate: 'yellow', advanced: 'red' };
+const diffColor = { '100': 'green', '200': 'blue', '300': 'yellow', '400': 'red' };
 
 function CourseCard({ course }) {
   return (
