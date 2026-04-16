@@ -102,7 +102,7 @@ export default function CourseDetailPage() {
                 <div className="flex items-center gap-2 flex-wrap">
                   {course.level && (
                     <Badge color={diffColor[course.level] || 'gray'}>
-                      {capitalize(course.level)}
+                      {course.level} Level
                     </Badge>
                   )}
                   {course.category && <Badge color="indigo">{course.category}</Badge>}
@@ -211,6 +211,3 @@ export default function CourseDetailPage() {
   );
 }
 
-function capitalize(s) {
-  return s ? s.charAt(0).toUpperCase() + s.slice(1) : '';
-}

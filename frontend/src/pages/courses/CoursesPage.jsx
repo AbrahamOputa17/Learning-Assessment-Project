@@ -105,7 +105,7 @@ function CourseCard({ course }) {
             <h3 className="font-semibold text-gray-900 line-clamp-2 flex-1">{course.title}</h3>
             {course.level && (
               <Badge color={diffColor[course.level] || 'gray'}>
-                {capitalize(course.level)}
+                {course.level} Level
               </Badge>
             )}
           </div>
@@ -122,6 +122,3 @@ function CourseCard({ course }) {
   );
 }
 
-function capitalize(s) {
-  return s ? s.charAt(0).toUpperCase() + s.slice(1) : '';
-}
