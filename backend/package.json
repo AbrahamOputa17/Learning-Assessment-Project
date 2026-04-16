@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node src/index.js",
     "dev": "nodemon src/index.js",
-    "db:init": "psql -U postgres -d learning_assessment -f src/database/schema.sql"
+    "db:init": "psql -U postgres -d learning_assessment -f src/database/schema.sql",
+    "db:migrate": "psql -U postgres -d learning_assessment -f src/database/migrations/001_add_level_to_courses.sql"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
