@@ -154,7 +154,7 @@ export default function CourseDetailPage() {
           ) : (
             <div className="grid gap-3 sm:grid-cols-2">
               {quizzes.map((q) => (
-                <Link key={q.id} to={`/quizzes/${q.id}`}>
+                <Link key={q.id} to={isOwner ? `/quizzes/${q.id}/manage` : `/quizzes/${q.id}`}>
                   <Card className="hover:shadow-md transition-shadow">
                     <CardBody className="flex items-center justify-between">
                       <div>

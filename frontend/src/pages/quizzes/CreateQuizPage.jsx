@@ -36,7 +36,7 @@ export default function CreateQuizPage() {
         passScore: parseInt(form.passScore),
       };
       const res = await quizzesApi.create(courseId, payload);
-      navigate(`/quizzes/${res.data.data.quiz.id}`);
+      navigate(`/quizzes/${res.data.data.quiz.id}/manage`);
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to create quiz');
     } finally {

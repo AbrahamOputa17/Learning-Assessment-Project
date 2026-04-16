@@ -18,6 +18,8 @@ import EditCoursePage from './pages/courses/EditCoursePage';
 // Quizzes
 import TakeQuizPage from './pages/quizzes/TakeQuizPage';
 import CreateQuizPage from './pages/quizzes/CreateQuizPage';
+import ManageQuizPage from './pages/quizzes/ManageQuizPage';
+import AddQuestionPage from './pages/quizzes/AddQuestionPage';
 
 // Coding
 import CodingQuizPage from './pages/coding/CodingQuizPage';
@@ -85,6 +87,22 @@ export default function App() {
             element={
               <ProtectedRoute>
                 <TakeQuizPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/quizzes/:quizId/manage"
+            element={
+              <ProtectedRoute roles={['instructor', 'admin']}>
+                <ManageQuizPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/quizzes/:quizId/add-question"
+            element={
+              <ProtectedRoute roles={['instructor', 'admin']}>
+                <AddQuestionPage />
               </ProtectedRoute>
             }
           />
