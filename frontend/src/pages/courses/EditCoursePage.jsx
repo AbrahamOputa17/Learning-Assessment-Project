@@ -25,7 +25,9 @@ export default function EditCoursePage() {
         level: c.level || '100',
         is_published: c.is_published ?? false,
       });
-    }).catch(() => navigate('/courses'));
+    }).catch(() => {
+      setError('Course not found or you do not have permission to edit it.');
+    });
   }, [id]);
 
   const handleChange = (e) => {
@@ -47,7 +49,20 @@ export default function EditCoursePage() {
     }
   };
 
-  if (!form) return <Layout><PageSpinner /></Layout>;
+  if (!form && !error) return <Layout><PageSpinner /></Layout>;
+
+  if (!form) {
+    return (
+      <Layout>
+        <div className="mx-auto max-w-2xl">
+          <Alert type="error">{error}</Alert>
+          <div className="mt-4">
+            <Button variant="secondary" onClick={() => navigate('/courses')}>Back to Courses</Button>
+          </div>
+        </div>
+      </Layout>
+    );
+  }
 
   return (
     <Layout>
