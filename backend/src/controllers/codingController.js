@@ -83,6 +83,19 @@ const CodingController = {
     }
   },
 
+  async updateCodingQuestion(req, res, next) {
+    try {
+      const question = await CodingService.updateCodingQuestion(
+        req.params.questionId,
+        req.user.id,
+        req.body
+      );
+      res.json({ status: 'success', data: { question } });
+    } catch (err) {
+      next(err);
+    }
+  },
+
   async submitCode(req, res, next) {
     try {
       const submission = await CodingService.submitCode(req.user.id, req.body);

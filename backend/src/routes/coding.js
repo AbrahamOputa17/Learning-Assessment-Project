@@ -57,9 +57,44 @@ router.post(
       .optional()
       .isIn(['javascript', 'python'])
       .withMessage('Unsupported language'),
+    body('deadline')
+      .optional()
+      .isISO8601()
+      .withMessage('deadline must be a valid ISO 8601 date'),
+    body('caWeight')
+      .optional()
+      .isFloat({ min: 0, max: 100 })
+      .withMessage('caWeight must be a number between 0 and 100'),
   ],
   validate,
   CodingController.addCodingQuestion
+);
+
+// PATCH /api/coding/quizzes/:quizId/questions/:questionId  — update coding question
+router.patch(
+  '/quizzes/:quizId/questions/:questionId',
+  authenticate,
+  authorize('instructor', 'admin'),
+  [
+    body('language')
+      .optional()
+      .isIn(['javascript', 'python'])
+      .withMessage('Unsupported language'),
+    body('difficulty')
+      .optional()
+      .isIn(['easy', 'medium', 'hard'])
+      .withMessage('difficulty must be easy, medium, or hard'),
+    body('deadline')
+      .optional()
+      .isISO8601()
+      .withMessage('deadline must be a valid ISO 8601 date'),
+    body('caWeight')
+      .optional()
+      .isFloat({ min: 0, max: 100 })
+      .withMessage('caWeight must be a number between 0 and 100'),
+  ],
+  validate,
+  CodingController.updateCodingQuestion
 );
 
 // POST /api/coding/submissions  — submit code (rate-limited)

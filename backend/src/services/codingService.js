@@ -135,6 +135,8 @@ const CodingService = {
       difficulty: questionData.difficulty || 'medium',
       points: questionData.points || 10,
       orderIndex: questionData.orderIndex || 0,
+      deadline: questionData.deadline || null,
+      caWeight: questionData.caWeight ?? 0,
     });
 
     if (questionData.testCases && questionData.testCases.length > 0) {
@@ -150,6 +152,30 @@ const CodingService = {
     }
 
     return CodingModel.findQuestionById(question.id);
+  },
+
+  async updateCodingQuestion(questionId, instructorId, data) {
+    const question = await CodingModel.findQuestionById(questionId);
+    if (!question) throw new AppError('Coding question not found', 404);
+
+    const quiz = await CodingModel.findQuizById(question.coding_quiz_id);
+    const course = await CourseModel.findById(quiz.course_id);
+    if (course.instructor_id !== instructorId) {
+      throw new AppError('Not authorized to update this question', 403);
+    }
+
+    return CodingModel.updateQuestion(questionId, {
+      title: data.title,
+      description: data.description,
+      starterCode: data.starterCode,
+      solutionCode: data.solutionCode,
+      language: data.language,
+      difficulty: data.difficulty,
+      points: data.points,
+      orderIndex: data.orderIndex,
+      deadline: data.deadline,
+      caWeight: data.caWeight,
+    });
   },
 
   async submitCode(userId, { codingQuestionId, code, language }) {

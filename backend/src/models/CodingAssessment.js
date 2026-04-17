@@ -113,13 +113,47 @@ const CodingModel = {
     return result.rows[0] || null;
   },
 
-  async createQuestion({ codingQuizId, title, description, starterCode, solutionCode, language, difficulty, points, orderIndex }) {
+  async createQuestion({ codingQuizId, title, description, starterCode, solutionCode, language, difficulty, points, orderIndex, deadline, caWeight }) {
     const result = await query(
       `INSERT INTO coding_questions
-         (coding_quiz_id, title, description, starter_code, solution_code, language, difficulty, points, order_index)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+         (coding_quiz_id, title, description, starter_code, solution_code, language, difficulty, points, order_index, deadline, ca_weight)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
        RETURNING *`,
-      [codingQuizId, title, description, starterCode, solutionCode, language, difficulty, points, orderIndex]
+      [codingQuizId, title, description, starterCode, solutionCode, language, difficulty, points, orderIndex, deadline, caWeight]
+    );
+    return result.rows[0];
+  },
+
+  async updateQuestion(id, fields) {
+    const allowed = {
+      title: 'title',
+      description: 'description',
+      starterCode: 'starter_code',
+      solutionCode: 'solution_code',
+      language: 'language',
+      difficulty: 'difficulty',
+      points: 'points',
+      orderIndex: 'order_index',
+      deadline: 'deadline',
+      caWeight: 'ca_weight',
+    };
+    const updates = [];
+    const values = [];
+    let idx = 1;
+
+    for (const [jsKey, dbKey] of Object.entries(allowed)) {
+      if (fields[jsKey] !== undefined) {
+        updates.push(`${dbKey} = $${idx++}`);
+        values.push(fields[jsKey]);
+      }
+    }
+
+    if (updates.length === 0) return this.findQuestionById(id);
+
+    values.push(id);
+    const result = await query(
+      `UPDATE coding_questions SET ${updates.join(', ')} WHERE id = $${idx} RETURNING *`,
+      values
     );
     return result.rows[0];
   },
