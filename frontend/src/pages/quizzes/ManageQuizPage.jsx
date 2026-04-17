@@ -98,6 +98,9 @@ export default function ManageQuizPage() {
                 >
                   {quiz.is_published ? 'Unpublish' : 'Publish'}
                 </Button>
+                <Link to={`/quizzes/${quizId}/generate-from-pdf`}>
+                  <Button variant="secondary">🤖 Generate from PDF</Button>
+                </Link>
                 <Link to={`/quizzes/${quizId}`}>
                   <Button variant="secondary">Preview (Take Quiz)</Button>
                 </Link>

@@ -83,6 +83,22 @@ const QuizController = {
       next(err);
     }
   },
+
+  async generateFromPdf(req, res, next) {
+    try {
+      if (!req.file) {
+        return res.status(400).json({ status: 'error', message: 'No PDF file uploaded' });
+      }
+      const questions = await QuizService.generateFromPdf(
+        req.params.quizId,
+        req.user.id,
+        req.file.buffer
+      );
+      res.json({ status: 'success', data: { questions } });
+    } catch (err) {
+      next(err);
+    }
+  },
 };
 
 module.exports = QuizController;

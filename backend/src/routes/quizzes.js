@@ -1,10 +1,24 @@
 const express = require('express');
 const { body } = require('express-validator');
+const multer = require('multer');
 const QuizController = require('../controllers/quizController');
 const { authenticate, authorize } = require('../middleware/auth');
 const validate = require('../middleware/validate');
 
 const router = express.Router();
+
+// multer: accept only PDF, max 10 MB, store in memory
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 10 * 1024 * 1024 },
+  fileFilter(req, file, cb) {
+    if (file.mimetype === 'application/pdf') {
+      cb(null, true);
+    } else {
+      cb(new Error('Only PDF files are allowed'));
+    }
+  },
+});
 
 // GET /api/quizzes/course/:courseId
 router.get('/course/:courseId', authenticate, QuizController.getQuizzesByCourse);
@@ -62,5 +76,14 @@ router.post('/attempts/:attemptId/submit', authenticate, QuizController.submitAt
 
 // GET /api/quizzes/:quizId/attempts  — attempt history
 router.get('/:quizId/attempts', authenticate, QuizController.getAttemptHistory);
+
+// POST /api/quizzes/:quizId/generate-from-pdf  — AI question generation
+router.post(
+  '/:quizId/generate-from-pdf',
+  authenticate,
+  authorize('instructor', 'admin'),
+  upload.single('pdf'),
+  QuizController.generateFromPdf
+);
 
 module.exports = router;

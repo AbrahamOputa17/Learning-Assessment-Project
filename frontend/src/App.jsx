@@ -20,6 +20,7 @@ import TakeQuizPage from './pages/quizzes/TakeQuizPage';
 import CreateQuizPage from './pages/quizzes/CreateQuizPage';
 import ManageQuizPage from './pages/quizzes/ManageQuizPage';
 import AddQuestionPage from './pages/quizzes/AddQuestionPage';
+import GenerateFromPdfPage from './pages/quizzes/GenerateFromPdfPage';
 
 // Coding
 import CodingQuizPage from './pages/coding/CodingQuizPage';
@@ -103,6 +104,14 @@ export default function App() {
             element={
               <ProtectedRoute roles={['instructor', 'admin']}>
                 <AddQuestionPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/quizzes/:quizId/generate-from-pdf"
+            element={
+              <ProtectedRoute roles={['instructor', 'admin']}>
+                <GenerateFromPdfPage />
               </ProtectedRoute>
             }
           />
