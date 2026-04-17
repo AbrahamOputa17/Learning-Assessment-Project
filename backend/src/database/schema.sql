@@ -143,6 +143,8 @@ CREATE TABLE IF NOT EXISTS coding_questions (
   difficulty       VARCHAR(20) DEFAULT 'medium' CHECK (difficulty IN ('easy', 'medium', 'hard')),
   points           INTEGER NOT NULL DEFAULT 10,
   order_index      INTEGER NOT NULL DEFAULT 0,
+  deadline         TIMESTAMPTZ,
+  ca_weight        NUMERIC(5,2) NOT NULL DEFAULT 0 CHECK (ca_weight >= 0 AND ca_weight <= 100),
   created_at       TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
@@ -173,7 +175,23 @@ CREATE TABLE IF NOT EXISTS code_submissions (
   test_results       JSONB DEFAULT '[]',
   error_message      TEXT,
   execution_time_ms  INTEGER,
+  is_late            BOOLEAN NOT NULL DEFAULT FALSE,
+  late_penalty       NUMERIC(5,2) NOT NULL DEFAULT 0,
   submitted_at       TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- ============================================================
+-- CODING SCORES (best-attempt per user per question)
+-- ============================================================
+CREATE TABLE IF NOT EXISTS coding_scores (
+  id                 UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id            UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  coding_question_id UUID NOT NULL REFERENCES coding_questions(id) ON DELETE CASCADE,
+  raw_score          NUMERIC(5,2) NOT NULL DEFAULT 0,
+  final_score        NUMERIC(5,2) NOT NULL DEFAULT 0,
+  ca_contribution    NUMERIC(5,2) NOT NULL DEFAULT 0,
+  updated_at         TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  UNIQUE (user_id, coding_question_id)
 );
 
 -- ============================================================
@@ -190,6 +208,8 @@ CREATE INDEX IF NOT EXISTS idx_coding_quizzes_course ON coding_quizzes(course_id
 CREATE INDEX IF NOT EXISTS idx_coding_questions_quiz ON coding_questions(coding_quiz_id);
 CREATE INDEX IF NOT EXISTS idx_code_submissions_user ON code_submissions(user_id);
 CREATE INDEX IF NOT EXISTS idx_code_submissions_question ON code_submissions(coding_question_id);
+CREATE INDEX IF NOT EXISTS idx_coding_scores_user     ON coding_scores(user_id);
+CREATE INDEX IF NOT EXISTS idx_coding_scores_question ON coding_scores(coding_question_id);
 
 -- ============================================================
 -- UPDATED_AT TRIGGER FUNCTION
