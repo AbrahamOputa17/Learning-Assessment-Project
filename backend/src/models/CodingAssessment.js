@@ -180,13 +180,15 @@ const CodingModel = {
     return result.rows[0];
   },
 
-  async updateSubmission(id, { status, score, testResults, errorMessage, executionTimeMs }) {
+  async updateSubmission(id, { status, score, testResults, errorMessage, executionTimeMs, isLate, latePenalty }) {
     const result = await query(
       `UPDATE code_submissions
-       SET status = $1, score = $2, test_results = $3, error_message = $4, execution_time_ms = $5
-       WHERE id = $6
+       SET status = $1, score = $2, test_results = $3, error_message = $4, execution_time_ms = $5,
+           is_late = $6, late_penalty = $7
+       WHERE id = $8
        RETURNING *`,
-      [status, score, JSON.stringify(testResults || []), errorMessage, executionTimeMs, id]
+      [status, score, JSON.stringify(testResults || []), errorMessage, executionTimeMs,
+       isLate ?? false, latePenalty ?? 0, id]
     );
     return result.rows[0];
   },

@@ -239,12 +239,19 @@ const CodingService = {
       }
     }
 
+    const isLate = question.deadline ? new Date() > new Date(question.deadline) : false;
+    const LATE_PENALTY_RATE = 0.2; // 20% deduction for late submissions
+    const latePenalty = isLate ? score * LATE_PENALTY_RATE : 0;
+    if (isLate) score = score - latePenalty;
+
     return CodingModel.updateSubmission(submission.id, {
       status,
       score,
       testResults,
       errorMessage,
       executionTimeMs,
+      isLate,
+      latePenalty,
     });
   },
 
