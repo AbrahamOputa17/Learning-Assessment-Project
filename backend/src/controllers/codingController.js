@@ -128,6 +128,28 @@ const CodingController = {
       next(err);
     }
   },
+
+  async getCourseGradebook(req, res, next) {
+    try {
+      const scores = await CodingService.getCourseGradebook(req.params.courseId, req.user);
+      res.json({ status: 'success', data: { scores } });
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  async getStudentGradebook(req, res, next) {
+    try {
+      const scores = await CodingService.getStudentGradebook(
+        req.params.courseId,
+        req.params.userId,
+        req.user
+      );
+      res.json({ status: 'success', data: { scores } });
+    } catch (err) {
+      next(err);
+    }
+  },
 };
 
 module.exports = CodingController;

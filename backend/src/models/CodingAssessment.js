@@ -211,6 +211,45 @@ const CodingModel = {
 
   // ---- Coding Scores (best-attempt per user per question) ----
 
+  async findScoresByCourse(courseId) {
+    const result = await query(
+      `SELECT cs.*,
+              u.name        AS student_name,
+              u.email       AS student_email,
+              cq.title      AS question_title,
+              cq.points     AS question_points,
+              cq.ca_weight  AS question_ca_weight
+       FROM coding_scores cs
+       JOIN users u              ON u.id  = cs.user_id
+       JOIN coding_questions cq  ON cq.id = cs.coding_question_id
+       JOIN coding_quizzes cqz   ON cqz.id = cq.coding_quiz_id
+       WHERE cqz.course_id = $1
+       ORDER BY u.name, cq.order_index`,
+      [courseId]
+    );
+    return result.rows;
+  },
+
+  async findScoresByStudentAndCourse(userId, courseId) {
+    const result = await query(
+      `SELECT cs.*,
+              u.name        AS student_name,
+              u.email       AS student_email,
+              cq.title      AS question_title,
+              cq.points     AS question_points,
+              cq.ca_weight  AS question_ca_weight
+       FROM coding_scores cs
+       JOIN users u              ON u.id  = cs.user_id
+       JOIN coding_questions cq  ON cq.id = cs.coding_question_id
+       JOIN coding_quizzes cqz   ON cqz.id = cq.coding_quiz_id
+       WHERE cqz.course_id = $1
+         AND cs.user_id    = $2
+       ORDER BY cq.order_index`,
+      [courseId, userId]
+    );
+    return result.rows;
+  },
+
   async upsertScore({ userId, codingQuestionId, rawScore, finalScore, caContribution }) {
     const result = await query(
       `INSERT INTO coding_scores (user_id, coding_question_id, raw_score, final_score, ca_contribution)

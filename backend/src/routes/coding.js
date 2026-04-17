@@ -125,4 +125,20 @@ router.get(
   CodingController.getSubmissionHistory
 );
 
+// GET /api/coding/scores/course/:courseId  — full gradebook (instructor/admin only)
+router.get(
+  '/scores/course/:courseId',
+  authenticate,
+  authorize('instructor', 'admin'),
+  CodingController.getCourseGradebook
+);
+
+// GET /api/coding/scores/student/:userId/course/:courseId  — per-student gradebook (instructor/admin only)
+router.get(
+  '/scores/student/:userId/course/:courseId',
+  authenticate,
+  authorize('instructor', 'admin'),
+  CodingController.getStudentGradebook
+);
+
 module.exports = router;
