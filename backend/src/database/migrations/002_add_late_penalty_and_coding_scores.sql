@@ -5,7 +5,8 @@
 
 ALTER TABLE coding_questions
   ADD COLUMN IF NOT EXISTS deadline  TIMESTAMPTZ,
-  ADD COLUMN IF NOT EXISTS ca_weight NUMERIC(5,2) NOT NULL DEFAULT 0;
+  ADD COLUMN IF NOT EXISTS ca_weight NUMERIC(5,2) NOT NULL DEFAULT 0
+    CHECK (ca_weight >= 0 AND ca_weight <= 100);
 
 ALTER TABLE code_submissions
   ADD COLUMN IF NOT EXISTS is_late     BOOLEAN      NOT NULL DEFAULT false,

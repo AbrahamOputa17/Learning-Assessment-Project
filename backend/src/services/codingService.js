@@ -244,11 +244,10 @@ const CodingService = {
     const LATE_PENALTY_RATE = 0.2; // 20% deduction for late submissions
     const latePenalty = isLate ? rawScore * LATE_PENALTY_RATE : 0;
     const finalScore = rawScore - latePenalty;
-    score = finalScore;
 
     const updatedSubmission = await CodingModel.updateSubmission(submission.id, {
       status,
-      score,
+      score: finalScore,
       testResults,
       errorMessage,
       executionTimeMs,
