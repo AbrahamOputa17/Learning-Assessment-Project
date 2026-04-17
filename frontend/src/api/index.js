@@ -43,4 +43,5 @@ export const codingApi = {
   submitCode: (data) => api.post('/coding/submissions', data),
   getSubmissionResults: (id) => api.get(`/coding/submissions/${id}/results`),
   getSubmissionHistory: (questionId) => api.get(`/coding/submissions/history/${questionId}`),
+  getMyScores: (courseId) => api.get(`/coding/scores/me/course/${courseId}`),
 };

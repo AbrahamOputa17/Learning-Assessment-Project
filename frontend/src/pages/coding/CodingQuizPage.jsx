@@ -68,6 +68,11 @@ export default function CodingQuizPage() {
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
+                      {q.deadline && (
+                        <Badge color={new Date() > new Date(q.deadline) ? 'red' : 'gray'}>
+                          {new Date() > new Date(q.deadline) ? '⏰ Overdue' : `Due ${new Date(q.deadline).toLocaleDateString()}`}
+                        </Badge>
+                      )}
                       {q.difficulty && (
                         <Badge color={diffColor[q.difficulty] || 'gray'}>
                           {capitalize(q.difficulty)}

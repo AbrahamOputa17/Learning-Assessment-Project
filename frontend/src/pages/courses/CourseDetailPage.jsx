@@ -16,6 +16,7 @@ export default function CourseDetailPage() {
   const [course, setCourse] = useState(null);
   const [quizzes, setQuizzes] = useState([]);
   const [codingQuizzes, setCodingQuizzes] = useState([]);
+  const [myScores, setMyScores] = useState([]);
   const [loading, setLoading] = useState(true);
   const [enrolling, setEnrolling] = useState(false);
   const [publishing, setPublishing] = useState(false);
@@ -32,6 +33,13 @@ export default function CourseDetailPage() {
         setCourse(cRes.data.data.course);
         setQuizzes(qRes.data.data.quizzes || []);
         setCodingQuizzes(cqRes.data.data.quizzes || []);
+        // fetch student's own coding scores (only for non-owners)
+        const isOwnerLoad =
+          user?.id === cRes.data.data.course?.instructor_id || user?.role === 'admin';
+        if (!isOwnerLoad) {
+          const scoresRes = await codingApi.getMyScores(id).catch(() => null);
+          setMyScores(scoresRes?.data?.data?.scores || []);
+        }
       } catch {
         navigate('/courses');
       } finally {
@@ -206,6 +214,44 @@ export default function CourseDetailPage() {
             </div>
           )}
         </section>
+        {/* My Coding Scores (students only) */}
+        {!isOwner && myScores.length > 0 && (
+          <section>
+            <h2 className="text-lg font-semibold text-gray-900 mb-3">📊 My Progress</h2>
+            <Card>
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b border-gray-100 text-left text-xs text-gray-500 uppercase tracking-wide">
+                      <th className="px-4 py-3">Problem</th>
+                      <th className="px-4 py-3 text-right">Raw Score</th>
+                      <th className="px-4 py-3 text-right">Final Score</th>
+                      <th className="px-4 py-3 text-right">CA Contribution</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {myScores.map((s) => (
+                      <tr key={s.id} className="border-b border-gray-50 hover:bg-gray-50">
+                        <td className="px-4 py-3 font-medium text-gray-900">{s.question_title}</td>
+                        <td className="px-4 py-3 text-right text-gray-600">
+                          {Number(s.raw_score).toFixed(1)} / {s.question_points}
+                        </td>
+                        <td className="px-4 py-3 text-right text-gray-600">
+                          {Number(s.final_score).toFixed(1)}
+                        </td>
+                        <td className="px-4 py-3 text-right">
+                          <Badge color={Number(s.ca_contribution) > 0 ? 'indigo' : 'gray'}>
+                            {Number(s.ca_contribution).toFixed(2)}
+                          </Badge>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </Card>
+          </section>
+        )}
       </div>
     </Layout>
   );
