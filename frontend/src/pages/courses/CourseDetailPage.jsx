@@ -34,9 +34,9 @@ export default function CourseDetailPage() {
         setQuizzes(qRes.data.data.quizzes || []);
         setCodingQuizzes(cqRes.data.data.quizzes || []);
         // fetch student's own coding scores (only for non-owners)
-        const isOwnerLoad =
+        const isInstructorView =
           user?.id === cRes.data.data.course?.instructor_id || user?.role === 'admin';
-        if (!isOwnerLoad) {
+        if (!isInstructorView) {
           const scoresRes = await codingApi.getMyScores(id).catch(() => null);
           setMyScores(scoresRes?.data?.data?.scores || []);
         }
