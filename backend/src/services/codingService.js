@@ -239,12 +239,14 @@ const CodingService = {
       }
     }
 
+    const rawScore = score;
     const isLate = question.deadline ? new Date() > new Date(question.deadline) : false;
     const LATE_PENALTY_RATE = 0.2; // 20% deduction for late submissions
-    const latePenalty = isLate ? score * LATE_PENALTY_RATE : 0;
-    if (isLate) score = score - latePenalty;
+    const latePenalty = isLate ? rawScore * LATE_PENALTY_RATE : 0;
+    const finalScore = rawScore - latePenalty;
+    score = finalScore;
 
-    return CodingModel.updateSubmission(submission.id, {
+    const updatedSubmission = await CodingModel.updateSubmission(submission.id, {
       status,
       score,
       testResults,
@@ -253,6 +255,17 @@ const CodingService = {
       isLate,
       latePenalty,
     });
+
+    const caContribution = finalScore * ((question.ca_weight || 0) / 100);
+    await CodingModel.upsertScore({
+      userId,
+      codingQuestionId,
+      rawScore,
+      finalScore,
+      caContribution,
+    });
+
+    return updatedSubmission;
   },
 
   async getSubmissionResults(submissionId, userId) {

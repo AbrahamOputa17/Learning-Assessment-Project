@@ -208,6 +208,24 @@ const CodingModel = {
     );
     return result.rows;
   },
+
+  // ---- Coding Scores (best-attempt per user per question) ----
+
+  async upsertScore({ userId, codingQuestionId, rawScore, finalScore, caContribution }) {
+    const result = await query(
+      `INSERT INTO coding_scores (user_id, coding_question_id, raw_score, final_score, ca_contribution)
+       VALUES ($1, $2, $3, $4, $5)
+       ON CONFLICT (user_id, coding_question_id) DO UPDATE
+         SET raw_score       = EXCLUDED.raw_score,
+             final_score     = EXCLUDED.final_score,
+             ca_contribution = EXCLUDED.ca_contribution,
+             updated_at      = NOW()
+       WHERE EXCLUDED.final_score > coding_scores.final_score
+       RETURNING *`,
+      [userId, codingQuestionId, rawScore, finalScore, caContribution]
+    );
+    return result.rows[0] || null;
+  },
 };
 
 module.exports = CodingModel;
