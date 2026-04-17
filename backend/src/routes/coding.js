@@ -125,6 +125,13 @@ router.get(
   CodingController.getSubmissionHistory
 );
 
+// GET /api/coding/scores/me/course/:courseId  — student's own scores
+router.get(
+  '/scores/me/course/:courseId',
+  authenticate,
+  CodingController.getMyScores
+);
+
 // GET /api/coding/scores/course/:courseId  — full gradebook (instructor/admin only)
 router.get(
   '/scores/course/:courseId',

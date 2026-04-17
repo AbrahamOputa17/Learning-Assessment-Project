@@ -150,6 +150,15 @@ const CodingController = {
       next(err);
     }
   },
+
+  async getMyScores(req, res, next) {
+    try {
+      const scores = await CodingService.getMyScores(req.params.courseId, req.user.id);
+      res.json({ status: 'success', data: { scores } });
+    } catch (err) {
+      next(err);
+    }
+  },
 };
 
 module.exports = CodingController;

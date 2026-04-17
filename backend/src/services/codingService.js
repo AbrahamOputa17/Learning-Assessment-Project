@@ -295,6 +295,12 @@ const CodingService = {
     }
     return CodingModel.findScoresByStudentAndCourse(studentId, courseId);
   },
+
+  async getMyScores(courseId, userId) {
+    const course = await CourseModel.findById(courseId);
+    if (!course) throw new AppError('Course not found', 404);
+    return CodingModel.findScoresByStudentAndCourse(userId, courseId);
+  },
 };
 
 module.exports = CodingService;
