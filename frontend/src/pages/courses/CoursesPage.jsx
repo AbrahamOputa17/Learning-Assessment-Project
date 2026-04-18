@@ -13,14 +13,14 @@ export default function CoursesPage() {
   const { user } = useAuth();
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [filters, setFilters] = useState({ category: '', difficulty: '' });
+  const [filters, setFilters] = useState({ category: '', level: '' });
 
   const load = async () => {
     setLoading(true);
     try {
       const params = {};
       if (filters.category) params.category = filters.category;
-      if (filters.difficulty) params.difficulty = filters.difficulty;
+      if (filters.level) params.level = filters.level;
       const res = await coursesApi.getAll(params);
       setCourses(res.data.data.courses);
     } catch {
@@ -60,14 +60,15 @@ export default function CoursesPage() {
             className="w-44"
           />
           <Select
-            value={filters.difficulty}
-            onChange={(e) => setFilters((f) => ({ ...f, difficulty: e.target.value }))}
+            value={filters.level}
+            onChange={(e) => setFilters((f) => ({ ...f, level: e.target.value }))}
             className="w-44"
           >
             <option value="">All levels</option>
-            <option value="beginner">Beginner</option>
-            <option value="intermediate">Intermediate</option>
-            <option value="advanced">Advanced</option>
+            <option value="100">100 Level</option>
+            <option value="200">200 Level</option>
+            <option value="300">300 Level</option>
+            <option value="400">400 Level</option>
           </Select>
           <Button type="submit" variant="secondary">Filter</Button>
         </form>
@@ -93,7 +94,7 @@ export default function CoursesPage() {
   );
 }
 
-const diffColor = { beginner: 'green', intermediate: 'yellow', advanced: 'red' };
+const diffColor = { '100': 'green', '200': 'blue', '300': 'yellow', '400': 'red' };
 
 function CourseCard({ course }) {
   return (
@@ -102,9 +103,9 @@ function CourseCard({ course }) {
         <CardBody className="flex flex-col gap-3 flex-1">
           <div className="flex items-start justify-between gap-2">
             <h3 className="font-semibold text-gray-900 line-clamp-2 flex-1">{course.title}</h3>
-            {course.difficulty && (
-              <Badge color={diffColor[course.difficulty] || 'gray'}>
-                {capitalize(course.difficulty)}
+            {course.level && (
+              <Badge color={diffColor[course.level] || 'gray'}>
+                {course.level} Level
               </Badge>
             )}
           </div>
@@ -121,6 +122,3 @@ function CourseCard({ course }) {
   );
 }
 
-function capitalize(s) {
-  return s ? s.charAt(0).toUpperCase() + s.slice(1) : '';
-}

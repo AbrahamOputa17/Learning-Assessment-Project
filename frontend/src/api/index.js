@@ -29,6 +29,10 @@ export const quizzesApi = {
   startAttempt: (quizId) => api.post(`/quizzes/${quizId}/attempt`),
   submitAttempt: (attemptId, data) => api.post(`/quizzes/attempts/${attemptId}/submit`, data),
   getAttemptHistory: (quizId) => api.get(`/quizzes/${quizId}/attempts`),
+  generateFromPdf: (quizId, formData) =>
+    api.post(`/quizzes/${quizId}/generate-from-pdf`, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    }),
 };
 
 export const codingApi = {
@@ -43,4 +47,5 @@ export const codingApi = {
   submitCode: (data) => api.post('/coding/submissions', data),
   getSubmissionResults: (id) => api.get(`/coding/submissions/${id}/results`),
   getSubmissionHistory: (questionId) => api.get(`/coding/submissions/history/${questionId}`),
+  getMyScores: (courseId) => api.get(`/coding/scores/me/course/${courseId}`),
 };

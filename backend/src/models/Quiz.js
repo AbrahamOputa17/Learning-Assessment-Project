@@ -3,14 +3,17 @@ const { query } = require('../config/database');
 const QuizModel = {
   /**
    * Find all quizzes for a course.
+   * @param {string} courseId
+   * @param {boolean} includeUnpublished - when true (instructors/admins), draft quizzes are included
    */
-  async findByCourse(courseId) {
+  async findByCourse(courseId, includeUnpublished = false) {
+    const publishedFilter = includeUnpublished ? '' : 'AND q.is_published = true';
     const result = await query(
       `SELECT q.*,
               COUNT(DISTINCT qs.id) AS question_count
        FROM quizzes q
        LEFT JOIN questions qs ON qs.quiz_id = q.id
-       WHERE q.course_id = $1
+       WHERE q.course_id = $1 ${publishedFilter}
        GROUP BY q.id
        ORDER BY q.created_at DESC`,
       [courseId]

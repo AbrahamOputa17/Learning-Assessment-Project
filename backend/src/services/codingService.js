@@ -135,6 +135,8 @@ const CodingService = {
       difficulty: questionData.difficulty || 'medium',
       points: questionData.points || 10,
       orderIndex: questionData.orderIndex || 0,
+      deadline: questionData.deadline || null,
+      caWeight: questionData.caWeight ?? 0,
     });
 
     if (questionData.testCases && questionData.testCases.length > 0) {
@@ -150,6 +152,30 @@ const CodingService = {
     }
 
     return CodingModel.findQuestionById(question.id);
+  },
+
+  async updateCodingQuestion(questionId, instructorId, data) {
+    const question = await CodingModel.findQuestionById(questionId);
+    if (!question) throw new AppError('Coding question not found', 404);
+
+    const quiz = await CodingModel.findQuizById(question.coding_quiz_id);
+    const course = await CourseModel.findById(quiz.course_id);
+    if (course.instructor_id !== instructorId) {
+      throw new AppError('Not authorized to update this question', 403);
+    }
+
+    return CodingModel.updateQuestion(questionId, {
+      title: data.title,
+      description: data.description,
+      starterCode: data.starterCode,
+      solutionCode: data.solutionCode,
+      language: data.language,
+      difficulty: data.difficulty,
+      points: data.points,
+      orderIndex: data.orderIndex,
+      deadline: data.deadline,
+      caWeight: data.caWeight,
+    });
   },
 
   async submitCode(userId, { codingQuestionId, code, language }) {
@@ -213,13 +239,32 @@ const CodingService = {
       }
     }
 
-    return CodingModel.updateSubmission(submission.id, {
+    const rawScore = score;
+    const isLate = question.deadline ? new Date() > new Date(question.deadline) : false;
+    const LATE_PENALTY_RATE = 0.2; // 20% deduction for late submissions
+    const latePenalty = isLate ? rawScore * LATE_PENALTY_RATE : 0;
+    const finalScore = rawScore - latePenalty;
+
+    const updatedSubmission = await CodingModel.updateSubmission(submission.id, {
       status,
-      score,
+      score: finalScore,
       testResults,
       errorMessage,
       executionTimeMs,
+      isLate,
+      latePenalty,
     });
+
+    const caContribution = finalScore * ((question.ca_weight || 0) / 100);
+    await CodingModel.upsertScore({
+      userId,
+      codingQuestionId,
+      rawScore,
+      finalScore,
+      caContribution,
+    });
+
+    return updatedSubmission;
   },
 
   async getSubmissionResults(submissionId, userId) {
@@ -231,6 +276,30 @@ const CodingService = {
 
   async getSubmissionHistory(userId, codingQuestionId) {
     return CodingModel.findSubmissionHistory(userId, codingQuestionId);
+  },
+
+  async getCourseGradebook(courseId, user) {
+    const course = await CourseModel.findById(courseId);
+    if (!course) throw new AppError('Course not found', 404);
+    if (user.role !== 'admin' && course.instructor_id !== user.id) {
+      throw new AppError('Not authorized to view gradebook for this course', 403);
+    }
+    return CodingModel.findScoresByCourse(courseId);
+  },
+
+  async getStudentGradebook(courseId, studentId, user) {
+    const course = await CourseModel.findById(courseId);
+    if (!course) throw new AppError('Course not found', 404);
+    if (user.role !== 'admin' && course.instructor_id !== user.id) {
+      throw new AppError('Not authorized to view gradebook for this course', 403);
+    }
+    return CodingModel.findScoresByStudentAndCourse(studentId, courseId);
+  },
+
+  async getMyScores(courseId, userId) {
+    const course = await CourseModel.findById(courseId);
+    if (!course) throw new AppError('Course not found', 404);
+    return CodingModel.findScoresByStudentAndCourse(userId, courseId);
   },
 };
 

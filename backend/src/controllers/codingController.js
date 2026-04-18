@@ -83,6 +83,19 @@ const CodingController = {
     }
   },
 
+  async updateCodingQuestion(req, res, next) {
+    try {
+      const question = await CodingService.updateCodingQuestion(
+        req.params.questionId,
+        req.user.id,
+        req.body
+      );
+      res.json({ status: 'success', data: { question } });
+    } catch (err) {
+      next(err);
+    }
+  },
+
   async submitCode(req, res, next) {
     try {
       const submission = await CodingService.submitCode(req.user.id, req.body);
@@ -111,6 +124,37 @@ const CodingController = {
         req.params.questionId
       );
       res.json({ status: 'success', data: { submissions } });
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  async getCourseGradebook(req, res, next) {
+    try {
+      const scores = await CodingService.getCourseGradebook(req.params.courseId, req.user);
+      res.json({ status: 'success', data: { scores } });
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  async getStudentGradebook(req, res, next) {
+    try {
+      const scores = await CodingService.getStudentGradebook(
+        req.params.courseId,
+        req.params.userId,
+        req.user
+      );
+      res.json({ status: 'success', data: { scores } });
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  async getMyScores(req, res, next) {
+    try {
+      const scores = await CodingService.getMyScores(req.params.courseId, req.user.id);
+      res.json({ status: 'success', data: { scores } });
     } catch (err) {
       next(err);
     }

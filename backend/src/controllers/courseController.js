@@ -3,10 +3,10 @@ const CourseService = require('../services/courseService');
 const CourseController = {
   async getAllCourses(req, res, next) {
     try {
-      const { category, difficulty, limit, offset } = req.query;
+      const { category, level, limit, offset } = req.query;
       const courses = await CourseService.getAllCourses({
         category,
-        difficulty,
+        level,
         limit: limit ? parseInt(limit, 10) : 20,
         offset: offset ? parseInt(offset, 10) : 0,
       });
@@ -45,7 +45,7 @@ const CourseController = {
 
   async updateCourse(req, res, next) {
     try {
-      const course = await CourseService.updateCourse(req.params.id, req.user.id, req.body);
+      const course = await CourseService.updateCourse(req.params.id, req.user, req.body);
       res.json({ status: 'success', data: { course } });
     } catch (err) {
       next(err);
@@ -54,7 +54,7 @@ const CourseController = {
 
   async deleteCourse(req, res, next) {
     try {
-      await CourseService.deleteCourse(req.params.id, req.user.id);
+      await CourseService.deleteCourse(req.params.id, req.user);
       res.json({ status: 'success', message: 'Course deleted' });
     } catch (err) {
       next(err);

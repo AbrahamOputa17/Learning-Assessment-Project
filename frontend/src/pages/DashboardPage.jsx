@@ -121,9 +121,10 @@ function StatCard({ label, value, icon, color }) {
 
 function CourseCard({ course }) {
   const diffColor = {
-    beginner: 'green',
-    intermediate: 'yellow',
-    advanced: 'red',
+    '100': 'green',
+    '200': 'blue',
+    '300': 'yellow',
+    '400': 'red',
   };
   return (
     <Link to={`/courses/${course.id}`}>
@@ -131,9 +132,9 @@ function CourseCard({ course }) {
         <CardBody className="space-y-3">
           <div className="flex items-start justify-between gap-2">
             <h3 className="font-semibold text-gray-900 line-clamp-2">{course.title}</h3>
-            {course.difficulty && (
-              <Badge color={diffColor[course.difficulty] || 'gray'}>
-                {capitalize(course.difficulty)}
+            {course.level && (
+              <Badge color={diffColor[course.level] || 'gray'}>
+                {course.level} Level
               </Badge>
             )}
           </div>

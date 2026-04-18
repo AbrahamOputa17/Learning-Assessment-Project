@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node src/index.js",
     "dev": "nodemon src/index.js",
-    "db:init": "psql -U postgres -d learning_assessment -f src/database/schema.sql"
+    "db:init": "psql -U postgres -d learning_assessment -f src/database/schema.sql",
+    "db:migrate": "psql -U postgres -d learning_assessment -f src/database/migrations/001_add_level_to_courses.sql && psql -U postgres -d learning_assessment -f src/database/migrations/002_add_late_penalty_and_coding_scores.sql"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
@@ -17,6 +18,9 @@
     "express-validator": "^7.0.1",
     "jsonwebtoken": "^9.0.2",
     "morgan": "^1.10.0",
+    "multer": "^2.1.1",
+    "openai": "^6.34.0",
+    "pdf-parse": "^2.4.5",
     "pg": "^8.11.3",
     "uuid": "^9.0.0",
     "winston": "^3.11.0"

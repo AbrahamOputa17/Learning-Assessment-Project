@@ -1,12 +1,16 @@
 const QuizModel = require('../models/Quiz');
 const CourseModel = require('../models/Course');
 const AppError = require('../utils/AppError');
+const config = require('../config');
+const OpenAI = require('openai');
+const pdfParse = require('pdf-parse');
 
 const QuizService = {
   async getQuizzesByCourse(courseId, user) {
     const course = await CourseModel.findById(courseId);
     if (!course) throw new AppError('Course not found', 404);
-    return QuizModel.findByCourse(courseId);
+    const isInstructor = user?.role === 'instructor' || user?.role === 'admin';
+    return QuizModel.findByCourse(courseId, isInstructor);
   },
 
   async getQuiz(quizId, includeAnswers = false) {
@@ -157,6 +161,61 @@ const QuizService = {
     const quiz = await QuizModel.findById(quizId);
     if (!quiz) throw new AppError('Quiz not found', 404);
     return QuizModel.findUserAttempts(quizId, userId);
+  },
+
+  async generateFromPdf(quizId, instructorId, pdfBuffer) {
+    const quiz = await QuizModel.findById(quizId);
+    if (!quiz) throw new AppError('Quiz not found', 404);
+
+    const course = await CourseModel.findById(quiz.course_id);
+    if (course.instructor_id !== instructorId) {
+      throw new AppError('Not authorized to generate questions for this quiz', 403);
+    }
+
+    if (!config.openai.apiKey) {
+      throw new AppError('AI question generation is not configured (missing OPENAI_API_KEY)', 503);
+    }
+
+    // Extract text from PDF
+    const pdfData = await pdfParse(pdfBuffer);
+    const text = pdfData.text.trim();
+    if (!text) throw new AppError('Could not extract text from the uploaded PDF', 422);
+
+    // Truncate to avoid token limits (≈ 12 000 chars ≈ 3 000 tokens)
+    const excerpt = text.length > 12000 ? text.slice(0, 12000) + '\n...' : text;
+
+    const openai = new OpenAI({ apiKey: config.openai.apiKey });
+
+    const completion = await openai.chat.completions.create({
+      model: 'gpt-4o-mini',
+      response_format: { type: 'json_object' },
+      messages: [
+        {
+          role: 'system',
+          content:
+            'You are a quiz-question generator. Given educational content, produce exactly 5 multiple-choice quiz questions. ' +
+            'Return ONLY a valid JSON object with a single key "questions" whose value is an array. ' +
+            'Each element must have: "questionText" (string), "options" (array of 4 objects each with "optionText" (string) and "isCorrect" (boolean, exactly one true per question)), "points" (number, default 1).',
+        },
+        {
+          role: 'user',
+          content: `Generate 5 multiple-choice quiz questions from the following content:\n\n${excerpt}`,
+        },
+      ],
+    });
+
+    let parsed;
+    try {
+      parsed = JSON.parse(completion.choices[0].message.content);
+    } catch {
+      throw new AppError('AI returned an unexpected response format', 502);
+    }
+
+    if (!Array.isArray(parsed.questions)) {
+      throw new AppError('AI returned an unexpected response format', 502);
+    }
+
+    return parsed.questions;
   },
 };
 

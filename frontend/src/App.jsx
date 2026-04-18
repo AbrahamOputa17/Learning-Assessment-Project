@@ -13,10 +13,14 @@ import DashboardPage from './pages/DashboardPage';
 import CoursesPage from './pages/courses/CoursesPage';
 import CourseDetailPage from './pages/courses/CourseDetailPage';
 import CreateCoursePage from './pages/courses/CreateCoursePage';
+import EditCoursePage from './pages/courses/EditCoursePage';
 
 // Quizzes
 import TakeQuizPage from './pages/quizzes/TakeQuizPage';
 import CreateQuizPage from './pages/quizzes/CreateQuizPage';
+import ManageQuizPage from './pages/quizzes/ManageQuizPage';
+import AddQuestionPage from './pages/quizzes/AddQuestionPage';
+import GenerateFromPdfPage from './pages/quizzes/GenerateFromPdfPage';
 
 // Coding
 import CodingQuizPage from './pages/coding/CodingQuizPage';
@@ -62,6 +66,14 @@ export default function App() {
             }
           />
           <Route
+            path="/courses/:id/edit"
+            element={
+              <ProtectedRoute roles={['instructor', 'admin']}>
+                <EditCoursePage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
             path="/courses/:id"
             element={
               <ProtectedRoute>
@@ -76,6 +88,30 @@ export default function App() {
             element={
               <ProtectedRoute>
                 <TakeQuizPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/quizzes/:quizId/manage"
+            element={
+              <ProtectedRoute roles={['instructor', 'admin']}>
+                <ManageQuizPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/quizzes/:quizId/add-question"
+            element={
+              <ProtectedRoute roles={['instructor', 'admin']}>
+                <AddQuestionPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/quizzes/:quizId/generate-from-pdf"
+            element={
+              <ProtectedRoute roles={['instructor', 'admin']}>
+                <GenerateFromPdfPage />
               </ProtectedRoute>
             }
           />

@@ -17,6 +17,8 @@ export default function AddCodingQuestionPage() {
     language: 'javascript',
     difficulty: 'medium',
     points: 10,
+    deadline: '',
+    caWeight: 0,
   });
   const [testCases, setTestCases] = useState([
     { input: '', expectedOutput: '', isHidden: false },
@@ -49,6 +51,8 @@ export default function AddCodingQuestionPage() {
       await codingApi.addQuestion(quizId, {
         ...form,
         points: parseInt(form.points),
+        caWeight: parseFloat(form.caWeight) || 0,
+        deadline: form.deadline || null,
         testCases: testCases.filter((tc) => tc.expectedOutput),
       });
       navigate(`/coding/${quizId}`);
@@ -115,6 +119,27 @@ export default function AddCodingQuestionPage() {
                   onChange={handleChange}
                   min="1"
                   required
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <Input
+                  id="deadline"
+                  label="Deadline (optional)"
+                  name="deadline"
+                  type="datetime-local"
+                  value={form.deadline}
+                  onChange={handleChange}
+                />
+                <Input
+                  id="caWeight"
+                  label="CA Weight (%)"
+                  name="caWeight"
+                  type="number"
+                  value={form.caWeight}
+                  onChange={handleChange}
+                  min="0"
+                  max="100"
+                  placeholder="0"
                 />
               </div>
             </CardBody>

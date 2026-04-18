@@ -17,6 +17,9 @@ const config = {
   cors: {
     origin: process.env.CORS_ORIGIN || 'http://localhost:3000',
   },
+  openai: {
+    apiKey: process.env.OPENAI_API_KEY || '',
+  },
 };
 
 module.exports = config;

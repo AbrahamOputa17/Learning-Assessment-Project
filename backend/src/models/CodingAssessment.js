@@ -113,13 +113,47 @@ const CodingModel = {
     return result.rows[0] || null;
   },
 
-  async createQuestion({ codingQuizId, title, description, starterCode, solutionCode, language, difficulty, points, orderIndex }) {
+  async createQuestion({ codingQuizId, title, description, starterCode, solutionCode, language, difficulty, points, orderIndex, deadline, caWeight }) {
     const result = await query(
       `INSERT INTO coding_questions
-         (coding_quiz_id, title, description, starter_code, solution_code, language, difficulty, points, order_index)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+         (coding_quiz_id, title, description, starter_code, solution_code, language, difficulty, points, order_index, deadline, ca_weight)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
        RETURNING *`,
-      [codingQuizId, title, description, starterCode, solutionCode, language, difficulty, points, orderIndex]
+      [codingQuizId, title, description, starterCode, solutionCode, language, difficulty, points, orderIndex, deadline, caWeight]
+    );
+    return result.rows[0];
+  },
+
+  async updateQuestion(id, fields) {
+    const allowed = {
+      title: 'title',
+      description: 'description',
+      starterCode: 'starter_code',
+      solutionCode: 'solution_code',
+      language: 'language',
+      difficulty: 'difficulty',
+      points: 'points',
+      orderIndex: 'order_index',
+      deadline: 'deadline',
+      caWeight: 'ca_weight',
+    };
+    const updates = [];
+    const values = [];
+    let idx = 1;
+
+    for (const [jsKey, dbKey] of Object.entries(allowed)) {
+      if (fields[jsKey] !== undefined) {
+        updates.push(`${dbKey} = $${idx++}`);
+        values.push(fields[jsKey]);
+      }
+    }
+
+    if (updates.length === 0) return this.findQuestionById(id);
+
+    values.push(id);
+    const result = await query(
+      `UPDATE coding_questions SET ${updates.join(', ')} WHERE id = $${idx} RETURNING *`,
+      values
     );
     return result.rows[0];
   },
@@ -146,13 +180,15 @@ const CodingModel = {
     return result.rows[0];
   },
 
-  async updateSubmission(id, { status, score, testResults, errorMessage, executionTimeMs }) {
+  async updateSubmission(id, { status, score, testResults, errorMessage, executionTimeMs, isLate, latePenalty }) {
     const result = await query(
       `UPDATE code_submissions
-       SET status = $1, score = $2, test_results = $3, error_message = $4, execution_time_ms = $5
-       WHERE id = $6
+       SET status = $1, score = $2, test_results = $3, error_message = $4, execution_time_ms = $5,
+           is_late = $6, late_penalty = $7
+       WHERE id = $8
        RETURNING *`,
-      [status, score, JSON.stringify(testResults || []), errorMessage, executionTimeMs, id]
+      [status, score, JSON.stringify(testResults || []), errorMessage, executionTimeMs,
+       isLate ?? false, latePenalty ?? 0, id]
     );
     return result.rows[0];
   },
@@ -171,6 +207,63 @@ const CodingModel = {
       [userId, codingQuestionId]
     );
     return result.rows;
+  },
+
+  // ---- Coding Scores (best-attempt per user per question) ----
+
+  async findScoresByCourse(courseId) {
+    const result = await query(
+      `SELECT cs.*,
+              u.name        AS student_name,
+              u.email       AS student_email,
+              cq.title      AS question_title,
+              cq.points     AS question_points,
+              cq.ca_weight  AS question_ca_weight
+       FROM coding_scores cs
+       JOIN users u              ON u.id  = cs.user_id
+       JOIN coding_questions cq  ON cq.id = cs.coding_question_id
+       JOIN coding_quizzes cqz   ON cqz.id = cq.coding_quiz_id
+       WHERE cqz.course_id = $1
+       ORDER BY u.name, cq.order_index`,
+      [courseId]
+    );
+    return result.rows;
+  },
+
+  async findScoresByStudentAndCourse(userId, courseId) {
+    const result = await query(
+      `SELECT cs.*,
+              u.name        AS student_name,
+              u.email       AS student_email,
+              cq.title      AS question_title,
+              cq.points     AS question_points,
+              cq.ca_weight  AS question_ca_weight
+       FROM coding_scores cs
+       JOIN users u              ON u.id  = cs.user_id
+       JOIN coding_questions cq  ON cq.id = cs.coding_question_id
+       JOIN coding_quizzes cqz   ON cqz.id = cq.coding_quiz_id
+       WHERE cqz.course_id = $1
+         AND cs.user_id    = $2
+       ORDER BY cq.order_index`,
+      [courseId, userId]
+    );
+    return result.rows;
+  },
+
+  async upsertScore({ userId, codingQuestionId, rawScore, finalScore, caContribution }) {
+    const result = await query(
+      `INSERT INTO coding_scores (user_id, coding_question_id, raw_score, final_score, ca_contribution)
+       VALUES ($1, $2, $3, $4, $5)
+       ON CONFLICT (user_id, coding_question_id) DO UPDATE
+         SET raw_score       = EXCLUDED.raw_score,
+             final_score     = EXCLUDED.final_score,
+             ca_contribution = EXCLUDED.ca_contribution,
+             updated_at      = NOW()
+       WHERE EXCLUDED.final_score > coding_scores.final_score
+       RETURNING *`,
+      [userId, codingQuestionId, rawScore, finalScore, caContribution]
+    );
+    return result.rows[0] || null;
   },
 };
 
